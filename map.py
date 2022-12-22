@@ -1,9 +1,6 @@
 import pygame
 
-from settings import TILES_WIDTH, TILES_HEIGHT
-
 P = False
-
 mini_map = [
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, ],
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, ],
@@ -19,7 +16,9 @@ mini_map = [
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, P, 1, ]]
 
 class Map:
-    def __init__(self, game):
+    def __init__(self, game, tile_height: int = 600, tile_width: int = 800):
+        self.tile_height = tile_height
+        self.tile_width = tile_width
         self.game = game
         self.mini_map = mini_map
         self.world_map = {}
@@ -31,7 +30,11 @@ class Map:
                 if value:
                     self.world_map[(i,j)] = value
 
+    @staticmethod
+    def get_rectangule(position, height, width):
+        return (position[0] * height, position[1] * width, height, width)
+    
     def draw(self):
         [pygame.draw.rect(self.game.screen, 'darkgray', 
-                         (pos[0] * TILES_HEIGHT, pos[1] * TILES_WIDTH, TILES_HEIGHT, TILES_WIDTH), 2)
+                         (self.get_rectangule(pos, self.tile_height, self.tile_width)), 2)
          for pos in self.world_map]
