@@ -2,6 +2,7 @@ from enum import Enum, auto
 
 import pygame
 
+from enemies import Enemy
 import map
 from settings import screen_properties
 
@@ -17,6 +18,8 @@ class Game:
         self.FPS = screen_properties['FPS']
         self.clock = pygame.time.Clock()
         self.status = GameState.STOPPED
+        self.enemy_list = []
+
 
     def initialize(self):
         self.status =  GameState.RUNNING
@@ -25,25 +28,38 @@ class Game:
 
     def update(self):
         pygame.display.flip()
-        self.clock.tick(self.FPS)
+        self.delta_time = self.clock.tick(self.FPS)
         pygame.display.set_caption(f'Great Game Name - FPS: { self.clock.get_fps() : .1f}')
+        for enemy in self.enemy_list:
+            enemy.update()
+            if enemy.check_oob():
+                self.enemy_list.remove(enemy)
+            
+
+    def get_enemy(self):
+        self.enemy_list.append(Enemy(self, self.map.path, 80, 50, 15))
 
     def draw(self):
         self.screen.fill('black')
         self.map.draw()
+        for enemy in self.enemy_list:
+            enemy.draw()
 
     def check_events(self):
         for event in pygame.event.get():
-            if (event.type == pygame.QUIT):
+            if event.type == pygame.QUIT:
                 self.exit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                self.get_enemy()
 
     def run(self):
         if self.status == GameState.STOPPED:
             self.initialize()
         while True:
+            self.check_events()
             self.update()
             self.draw()
-            self.check_events()
+            
 
     def exit(self):
         self.status == GameState.STOPPED
