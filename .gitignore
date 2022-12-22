@@ -1,0 +1,4 @@
+# project directories to ignore
+.venv/
+.vscode/
+__pycache__/
