@@ -25,10 +25,13 @@ class Map:
 
     def get_map(self):
         full_map = {}
+        self.path = []
         for j, row in enumerate(self.mini_map):
             for i, value in enumerate(row):
                 if value:
                     full_map[(i,j)] = value
+                else:
+                    self.path.append((i,j))
         return full_map
 
     def get_rectangule(self, position):
