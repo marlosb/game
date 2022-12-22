@@ -16,10 +16,10 @@ class Game:
         self.TILES_WIDTH = screen_properties.TILES_WIDTH
         self.FPS = screen_properties.FPS
         self.clock = pygame.time.Clock()
-        self.status: GameState = GameState.STOPPED
+        self.status = GameState.STOPPED
 
     def initialize(self):
-        self.status: GameState = GameState.RUNNING
+        self.status =  GameState.RUNNING
         pygame.init()
         self.new_game()
 
@@ -38,15 +38,19 @@ class Game:
     def check_events(self):
         for event in pygame.event.get():
             if (event.type == pygame.QUIT):
-                pygame.quit()
+                self.exit()
 
     def run(self):
         if self.status == GameState.STOPPED:
             self.initialize()
         while True:
-            self.check_events()
             self.update()
             self.draw()
+            self.check_events()
+
+    def exit(self):
+        self.status == GameState.STOPPED
+        pygame.quit()
 
 if __name__ == '__main__':
     game = Game(screen_properties)
