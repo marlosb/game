@@ -21,10 +21,7 @@ class Game:
     def initialize(self):
         self.status =  GameState.RUNNING
         pygame.init()
-        self.new_game()
-
-    def new_game(self):
-        self.map = map.Map(self, self.TILES_HEIGHT, self.TILES_HEIGHT)
+        self.map = map.Map(self, map.init_map, self.TILES_HEIGHT, self.TILES_HEIGHT)      
 
     def update(self):
         pygame.display.flip()

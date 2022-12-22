@@ -1,5 +1,3 @@
-from dataclasses import dataclass
-
 FPS = 60 
 SCREEN_SIZE = WIDTH, HEIGHT = 800 , 600
 HORIZONTAL_TILES_AMOUNT = 16
