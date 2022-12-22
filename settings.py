@@ -7,12 +7,7 @@ VERTICAL_TILES_AMOUNT = 12
 TILES_WIDTH = WIDTH / HORIZONTAL_TILES_AMOUNT
 TILES_HEIGHT = HEIGHT / VERTICAL_TILES_AMOUNT
 
-@dataclass
-class ScreenProperties():
-    def __init__(self, SCREEN_SIZE, TILES_HEIGHT, TILES_WIDTH, FPS):
-        self.SCREEN_SIZE = SCREEN_SIZE
-        self.TILES_HEIGHT = TILES_HEIGHT
-        self.TILES_WIDTH = TILES_WIDTH
-        self.FPS = FPS
-
-screen_properties = ScreenProperties(SCREEN_SIZE, TILES_HEIGHT, TILES_WIDTH, FPS)
+screen_properties = {'SCREEN_SIZE' : SCREEN_SIZE, 
+                     'TILES_HEIGHT' : TILES_HEIGHT, 
+                     'TILES_WIDTH' : TILES_WIDTH, 
+                     'FPS' : FPS}

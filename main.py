@@ -3,18 +3,18 @@ from enum import Enum, auto
 import pygame
 
 import map
-from settings import ScreenProperties, screen_properties
+from settings import screen_properties
 
 class GameState(Enum):
     STOPPED = auto()
     RUNNING = auto()
 
 class Game:
-    def __init__(self, screen_properties: ScreenProperties):
-        self.screen = pygame.display.set_mode(screen_properties.SCREEN_SIZE)
-        self.TILES_HEIGHT = screen_properties.TILES_HEIGHT
-        self.TILES_WIDTH = screen_properties.TILES_WIDTH
-        self.FPS = screen_properties.FPS
+    def __init__(self, screen_properties: dict):
+        self.screen = pygame.display.set_mode(screen_properties['SCREEN_SIZE'])
+        self.TILES_HEIGHT = screen_properties['TILES_HEIGHT'] 
+        self.TILES_WIDTH = screen_properties['TILES_WIDTH']
+        self.FPS = screen_properties['FPS']
         self.clock = pygame.time.Clock()
         self.status = GameState.STOPPED
 
