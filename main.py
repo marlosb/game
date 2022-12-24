@@ -37,7 +37,7 @@ class Game:
             
 
     def get_enemy(self):
-        self.enemy_list.append(Enemy(self, self.map.path, 80, 50, 15))
+        self.enemy_list.append(Enemy(self, self.map.path, 80, 100, 15))
 
     def draw(self):
         self.screen.fill('black')
