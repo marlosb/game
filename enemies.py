@@ -1,7 +1,7 @@
 import pygame
 
 class Enemy:
-    def __init__(self, game, path, max_life: int = 80, speed: int = 25, size: int = 15):
+    def __init__(self, game, path, max_life: int = 80, speed: int = 25, size: int = 15, color = 'red'):
         self.game = game
         self.max_life = max_life
         self.speed = speed
@@ -12,6 +12,7 @@ class Enemy:
         self.path_position = 0
         self.size = size
         self.direction = (1,0)  
+        self.color = color
 
     def _get_direction(self, next_x, next_y):
         ''' Method to update the direction enemy is going. 
@@ -77,4 +78,4 @@ class Enemy:
         return False
 
     def draw(self):
-        pygame.draw.circle(self.game.screen, 'red', self.position, self.size)
+        pygame.draw.circle(self.game.screen, self.color, self.position, self.size)
