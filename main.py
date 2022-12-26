@@ -28,7 +28,7 @@ class Game:
 
     def update(self):
         pygame.display.flip()
-        self.delta_time = self.clock.tick(self.FPS)
+        self.delta_milliseconds = self.clock.tick(self.FPS)
         pygame.display.set_caption(f'Great Game Name - FPS: { self.clock.get_fps() : .1f}')
         for enemy in self.enemy_list:
             enemy.update()

@@ -1,5 +1,3 @@
-from enum import Enum, auto
-
 import pygame
 
 class Enemy:
@@ -15,16 +13,13 @@ class Enemy:
         self.size = size
         self.direction = (1,0)  
 
-    def get_direction(self):
-        current_x = self.position[0]
-        current_y = self.position[1]
-
+    def _get_direction(self, next_x, next_y):
+        ''' Method to update the direction enemy is going. 
+            Should not be called outsite move method'''
         self.path_position = self.path_position + 1
-        next_x = (self.path[self.path_position][0] * self.game.TILES_WIDTH) + self.POSITION_OFFSET
-        next_y = (self.path[self.path_position][1] * self.game.TILES_HEIGHT) + self.POSITION_OFFSET
 
-        delta_x = next_x - current_x
-        delta_y = next_y - current_y
+        delta_x = next_x - self.position[0]
+        delta_y = next_y - self.position[1]
 
         if (abs(delta_x) > abs(delta_y)):
             if delta_x > 0:
@@ -38,46 +33,48 @@ class Enemy:
                 self.direction = (0,-1)
 
     def move(self):
-        elapsed_seconds = self.game.delta_time / 1000
+        ''' Function to move enemy following map path'''
+        elapsed_seconds = self.game.delta_milliseconds / 1000
         step = self.speed * elapsed_seconds
-        #step = 20
-
-        current_x = self.position[0] + (step * self.direction[0])
-        current_y = self.position[1] + (step * self.direction[1])
+        #step = 20 # fix step size for debugging as delta time gets huge on debugging
 
         next_x = (self.path[self.path_position][0] * self.game.TILES_WIDTH) + self.POSITION_OFFSET
-        next_y = (self.path[self.path_position][1] * self.game.TILES_HEIGHT)+ self.POSITION_OFFSET
+        next_y = (self.path[self.path_position][1] * self.game.TILES_HEIGHT) + self.POSITION_OFFSET
 
-        if self.direction[0]:
-            if current_x > next_x:
-                overrun = current_x - next_x
-                self.position = next_x, current_y
-                self.get_direction()
-                overrun_x = overrun * self.direction[0]
-                overrun_y = overrun * self.direction[1]
-                self.position = next_x + overrun_x, current_y + overrun_y
-            else:
-                self.position = current_x, current_y
-        else:
-            if current_y > next_y:
-                overrun = current_y - next_y
-                self.position = current_x, next_y
-                self.get_direction()
-                overrun_x = overrun * self.direction[0]
-                overrun_y = overrun * self.direction[1]
-                self.position = current_x + overrun_x, next_y + overrun_y
-            else: 
-                self.position = current_x, current_y
+        updated_x = self.position[0] + (step * self.direction[0])
+        updated_y = self.position[1] + (step * self.direction[1])
+
+        if (updated_x > next_x) and (self.direction[0] > 0):
+            overrun = next_x - updated_x
+            self._get_direction(next_x, next_y)
+            updated_x = next_x + (overrun * self.direction[0])
+            updated_y = updated_y + (overrun * self.direction[1])
+        if (updated_x < next_x) and (self.direction[0] < 0):
+            overrun = updated_x - next_x
+            self._get_direction(next_x, next_y)
+            updated_x = next_x + (overrun * self.direction[0])
+            updated_y = updated_y + (overrun * self.direction[1])
+        if (updated_y > next_y) and (self.direction[1] > 0):
+            overrun = next_y - updated_y
+            self._get_direction(next_x, next_y)
+            updated_x = updated_x + (overrun * self.direction[0])
+            updated_y = next_y + (overrun * self.direction[1])
+        if (updated_y < next_y) and (self.direction[1] < 0):
+            overrun = updated_y - next_y
+            self._get_direction(next_x, next_y)
+            updated_x = updated_x + (overrun * self.direction[0])
+            updated_y = next_y + (overrun * self.direction[1])
+
+        self.position = updated_x, updated_y
 
     def update(self):
         self.move()
 
     def check_oob(self): # check if it is out of boundaries
         max_x, max_y = pygame.display.get_window_size()
-        if (self.position[0] + self.size >= max_x) or (self.position[1]  + self.size >= max_y):
+        if (self.position[0] + self.size >= max_x + self.size) or (self.position[1]  + self.size >= max_y + self.size):
             return True
         return False
 
     def draw(self):
         pygame.draw.circle(self.game.screen, 'red', self.position, self.size)
-
