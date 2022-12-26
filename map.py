@@ -47,21 +47,29 @@ class Map:
             # check if right tile is on path
             candidate_tile = previous_step[0] + 1, previous_step[1]
             if (candidate_tile in self.path) and (candidate_tile not in ordered_path):
-                next_step = candidate_tile
+                ordered_path.append(candidate_tile)
+                previous_step = candidate_tile  
+                continue
             # check if bottom tile is on path
             candidate_tile = previous_step[0], previous_step[1] + 1
             if (candidate_tile in self.path) and (candidate_tile not in ordered_path):
-                next_step = candidate_tile
+                ordered_path.append(candidate_tile)
+                previous_step = candidate_tile  
+                continue
             # check if left tile is on path
             candidate_tile = previous_step[0] - 1, previous_step[1]
             if (candidate_tile in self.path) and (candidate_tile not in ordered_path):
-                next_step = candidate_tile
+                ordered_path.append(candidate_tile)
+                previous_step = candidate_tile  
+                continue
             # check if upp tile is on path
             candidate_tile = previous_step[0], previous_step[1] - 1
             if (candidate_tile in self.path) and (candidate_tile not in ordered_path):
-                next_step = candidate_tile
-            ordered_path.append(next_step)
-            previous_step = next_step         
+                ordered_path.append(candidate_tile)
+                previous_step = candidate_tile  
+                continue
+        last_step = candidate_tile[0], candidate_tile[1] + 1
+        ordered_path.append(last_step)
         self.path = ordered_path
 
     def get_rectangule(self, position):
