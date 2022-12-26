@@ -2,11 +2,11 @@ import pygame
 
 class Enemy:
     def __init__(self, game, path, max_life: int = 80, speed: int = 25, size: int = 15, color = 'red'):
+        self.POSITION_OFFSET = 25
         self.game = game
         self.max_life = max_life
         self.speed = speed
         self.path = path
-        self.POSITION_OFFSET = 25
         self.position = ((path[0][0] - 1) * self.game.TILES_WIDTH + self.POSITION_OFFSET, 
                          path[0][1] * self.game.TILES_HEIGHT + self.POSITION_OFFSET)
         self.path_position = 0

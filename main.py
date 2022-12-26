@@ -5,10 +5,15 @@ import pygame
 from enemies import Enemy
 import map
 from settings import screen_properties
+from structure import DefensiveStructure
 
 class GameState(Enum):
     STOPPED = auto()
     RUNNING = auto()
+
+class SpawMode(Enum):
+    ENEMY = auto()
+    STRUCTURE = auto()
 
 class Game:
     def __init__(self, screen_properties: dict):
@@ -18,8 +23,9 @@ class Game:
         self.FPS = screen_properties['FPS']
         self.clock = pygame.time.Clock()
         self.status = GameState.STOPPED
+        self.spaw_mode = SpawMode.ENEMY
         self.enemy_list = []
-
+        self.strustures_list = []
 
     def initialize(self):
         self.status =  GameState.RUNNING
@@ -33,24 +39,41 @@ class Game:
         for enemy in self.enemy_list:
             enemy.update()
             if enemy.check_oob():
-                self.enemy_list.remove(enemy)
-            
+                self.enemy_list.remove(enemy)        
 
     def get_enemy(self):
         self.enemy_list.append(Enemy(self, self.map.path, 80, 100, 15))
+
+    def get_structure(self):
+        self.strustures_list.append(DefensiveStructure(self))
 
     def draw(self):
         self.screen.fill('black')
         self.map.draw()
         for enemy in self.enemy_list:
             enemy.draw()
+        for structure in self.strustures_list:
+            structure.draw()
+
+    def spaw_object(self):
+        spaw_dict = {SpawMode.ENEMY: self.get_enemy,
+                     SpawMode.STRUCTURE: self.get_structure}
+        spaw_dict[self.spaw_mode]()
+
+    def key_down(self, event):
+        if event.key == pygame.K_1:
+            self.spaw_mode = SpawMode.ENEMY
+        elif event.key == pygame.K_2:
+            self.spaw_mode = SpawMode.STRUCTURE
 
     def check_events(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.exit()
+            if event.type == pygame.KEYDOWN:
+                self.key_down(event)
             if event.type == pygame.MOUSEBUTTONDOWN:
-                self.get_enemy()
+                self.spaw_object()
 
     def run(self):
         if self.status == GameState.STOPPED:
