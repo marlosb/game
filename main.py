@@ -14,6 +14,7 @@ class GameState(Enum):
 class SpawMode(Enum):
     ENEMY = auto()
     STRUCTURE = auto()
+    SHOT = auto()
 
 class Game:
     def __init__(self, screen_properties: dict):
@@ -45,7 +46,11 @@ class Game:
         self.enemy_list.append(Enemy(self, self.map.path, 80, 100, 15))
 
     def get_structure(self):
-        self.strustures_list.append(DefensiveStructure(self))
+        self.strustures_list.append(DefensiveStructure(self, range = 400))
+    
+    def get_shot(self):
+        for structure in self.strustures_list:
+            structure.shot_enemy()
 
     def draw(self):
         self.screen.fill('black')
@@ -57,7 +62,8 @@ class Game:
 
     def spaw_object(self):
         spaw_dict = {SpawMode.ENEMY: self.get_enemy,
-                     SpawMode.STRUCTURE: self.get_structure}
+                     SpawMode.STRUCTURE: self.get_structure,
+                     SpawMode.SHOT: self.get_shot}
         spaw_dict[self.spaw_mode]()
 
     def key_down(self, event):
@@ -65,6 +71,8 @@ class Game:
             self.spaw_mode = SpawMode.ENEMY
         elif event.key == pygame.K_2:
             self.spaw_mode = SpawMode.STRUCTURE
+        elif event.key == pygame.K_3:
+            self.spaw_mode = SpawMode.SHOT
 
     def check_events(self):
         for event in pygame.event.get():
