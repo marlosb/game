@@ -13,62 +13,59 @@ class DefensiveStructure():
         self.POSITION_OFFSET = 25
         self.game = game
         self.type = type
-        self.rate_of_fire = rate_of_fire
+        self.seconds_between_shots = 1 / rate_of_fire 
         self.damage = damage
         self.position = (position[0] * self.game.TILES_WIDTH + self.POSITION_OFFSET, 
                          position[1] * self.game.TILES_HEIGHT + self.POSITION_OFFSET)
-        self.shots_list = []
+        self.clock = None
+        self.delta_milliseconds = 0
+        self.accumulated_seconds = 0
+        self.shot = None
         if type == StructureType.RANGE:
             self.range = range
         else:
             self.range = None
 
+    def add_timer(self):
+        self.accumulated_seconds = self.accumulated_seconds + (self.delta_milliseconds / 1000)
+
+    def ready_to_shot(self):
+        if not self.clock:
+            self.clock = pygame.time.Clock()
+            return True
+        else:
+            self.clock.tick()
+            self.delta_milliseconds = self.clock.get_time()
+            self.add_timer()
+            if self.accumulated_seconds >= self.seconds_between_shots:
+                return True
+        return False
+
     def get_closest_enemy(self):
-        closest_enemy = None
+        closest_enemy = False
         lowest_distance = self.range
         for enemy in self.game.enemy_list:
-            distance = sqrt(self.position[0] * enemy.position[0] 
-                            + self.position[1] * enemy.position[1])
+            distance = sqrt((self.position[0] - enemy.position[0]) ** 2 
+                            + (self.position[1] - enemy.position[1]) ** 2)
             if (distance < lowest_distance) and (distance < self.range):
                 lowest_distance = distance
                 closest_enemy = enemy
         return closest_enemy
 
     def shot_enemy(self):
+        if not self.ready_to_shot():
+            return
         closest_enemy = self.get_closest_enemy()
         if closest_enemy:
-            speed = 4 * closest_enemy.speed
-            self.shots_list.append(Shot(self.game, self.position, closest_enemy.position, speed))
+            self.shot_seconds = self.accumulated_seconds
+            self.accumulated_seconds = 0
+            self.shot = closest_enemy
+            closest_enemy.take_damage(self.damage)
 
     def run(self):
-        for shot in self.shots_list:
-            shot.run()
-
+        self.shot_enemy()
+    
     def draw(self):
         pygame.draw.circle(self.game.screen, 'blue', self.position, 20)
-        for shot in self.shots_list:
-            shot.draw()
-    
-class Shot():
-    def __init__(self, game, initial_position: tuple[int, int], final_position: tuple[int, int], speed: int = 100):
-        self.game = game
-        self.speed = speed
-        self.current_position = initial_position
-        self.final_position = final_position
-        self.current_distance = sqrt(self.current_position[0] * self.final_position[0] 
-                                     + self.current_position[1] * self.final_position[1])
-        self.angle = acos((self.final_position[0] - self.current_position[0]) / self.current_distance)
-
-    def run(self):
-        elapsed_seconds = self.game.delta_milliseconds / 1000
-        step = self.speed * elapsed_seconds
-        #step = 80 # fix step size for debugging as delta time gets huge on debugging
-
-        self.current_distance = self.current_distance - step
-
-        new_x = self.current_position[0] + self.current_distance * cos(self.angle)
-        new_y = self.current_position[1] + self.current_distance * sin(self.angle)
-        self.current_position = new_x, new_y
-
-    def draw(self):
-        pygame.draw.line(self.game.screen, 'white', self.current_position, self.final_position)
+        if self.shot and (self.accumulated_seconds <= 0.15):
+            pygame.draw.line(self.game.screen, 'white', self.position, self.shot.position, width=2)

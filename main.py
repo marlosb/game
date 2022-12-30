@@ -23,30 +23,42 @@ class Game:
         self.TILES_WIDTH = screen_properties['TILES_WIDTH']
         self.FPS = screen_properties['FPS']
         self.clock = pygame.time.Clock()
+        self.accumulated_seconds = 0
         self.status = GameState.STOPPED
         self.spaw_mode = SpawMode.ENEMY
         self.enemy_list = []
         self.strustures_list = []
+        self.enemies_clock = None
+        self.level = 1
 
     def initialize(self):
         self.status =  GameState.RUNNING
         pygame.init()
         self.map = map.Map(self, map.init_map, self.TILES_HEIGHT, self.TILES_HEIGHT)      
 
+    def add_timer(self):
+        self.accumulated_seconds = self.accumulated_seconds + (self.delta_milliseconds / 1000)
+    
     def update(self):
         pygame.display.flip()
         self.delta_milliseconds = self.clock.tick(self.FPS)
-        pygame.display.set_caption(f'Great Game Name - FPS: { self.clock.get_fps() : .1f}')
+        self.add_timer()
+        pygame.display.set_caption(f'Great Game Name - FPS: {self.clock.get_fps() : .1f} - Timer: {self.accumulated_seconds} s - Len(enemies_list: {len(self.enemy_list)})')
+        if self.accumulated_seconds >= 1 and (len(self.enemy_list) < 5):
+            self.get_enemy()
+            self.accumulated_seconds = 0
         for enemy in self.enemy_list:
             enemy.update()
-            if enemy.check_oob():
-                self.enemy_list.remove(enemy)        
-
+            if enemy.check_oob() or enemy.check_death():
+                self.enemy_list.remove(enemy) 
+        for structure in self.strustures_list:
+            structure.run()       
+    
     def get_enemy(self):
         self.enemy_list.append(Enemy(self, self.map.path, 80, 100, 15))
 
     def get_structure(self):
-        self.strustures_list.append(DefensiveStructure(self, range = 400))
+        self.strustures_list.append(DefensiveStructure(self, range = 100))
     
     def get_shot(self):
         for structure in self.strustures_list:
@@ -68,7 +80,7 @@ class Game:
 
     def key_down(self, event):
         if event.key == pygame.K_1:
-            self.spaw_mode = SpawMode.ENEMY
+            self.spaw_mode = SpawMode.STRUCTURE
         elif event.key == pygame.K_2:
             self.spaw_mode = SpawMode.STRUCTURE
         elif event.key == pygame.K_3:
@@ -89,8 +101,7 @@ class Game:
         while True:
             self.check_events()
             self.update()
-            self.draw()
-            
+            self.draw()            
 
     def exit(self):
         self.status == GameState.STOPPED

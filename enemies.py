@@ -77,5 +77,13 @@ class Enemy:
             return True
         return False
 
+    def take_damage(self, damage):
+        self.max_life = self.max_life - damage
+
+    def check_death(self):
+        if self.max_life > 0:
+            return False
+        return True
+
     def draw(self):
         pygame.draw.circle(self.game.screen, self.color, self.position, self.size)
