@@ -21,11 +21,12 @@ class Game:
         self.screen = pygame.display.set_mode(screen_properties['SCREEN_SIZE'])
         self.TILES_HEIGHT = screen_properties['TILES_HEIGHT'] 
         self.TILES_WIDTH = screen_properties['TILES_WIDTH']
+        self.POSITION_OFFSET = 25
         self.FPS = screen_properties['FPS']
         self.clock = pygame.time.Clock()
         self.accumulated_seconds = 0
         self.status = GameState.STOPPED
-        self.spaw_mode = SpawMode.ENEMY
+        self.spaw_mode = SpawMode.STRUCTURE
         self.enemy_list = []
         self.strustures_list = []
         self.enemies_clock = None
@@ -58,11 +59,10 @@ class Game:
         self.enemy_list.append(Enemy(self, self.map.path, 80, 100, 15))
 
     def get_structure(self):
-        self.strustures_list.append(DefensiveStructure(self, range = 100))
-    
-    def get_shot(self):
-        for structure in self.strustures_list:
-            structure.shot_enemy()
+        pos = pygame.mouse.get_pos()
+        pos = (int(pos[0] / self.TILES_WIDTH), int(pos[1] / self.TILES_HEIGHT))
+        if pos not in game.map.path:
+            self.strustures_list.append(DefensiveStructure(self, position = pos, range = 100))
 
     def draw(self):
         self.screen.fill('black')
@@ -74,8 +74,7 @@ class Game:
 
     def spaw_object(self):
         spaw_dict = {SpawMode.ENEMY: self.get_enemy,
-                     SpawMode.STRUCTURE: self.get_structure,
-                     SpawMode.SHOT: self.get_shot}
+                     SpawMode.STRUCTURE: self.get_structure}
         spaw_dict[self.spaw_mode]()
 
     def key_down(self, event):
@@ -84,7 +83,7 @@ class Game:
         elif event.key == pygame.K_2:
             self.spaw_mode = SpawMode.STRUCTURE
         elif event.key == pygame.K_3:
-            self.spaw_mode = SpawMode.SHOT
+            self.spaw_mode = SpawMode.STRUCTURE
 
     def check_events(self):
         for event in pygame.event.get():
