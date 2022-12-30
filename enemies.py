@@ -2,13 +2,12 @@ import pygame
 
 class Enemy:
     def __init__(self, game, path, max_life: int = 80, speed: int = 25, size: int = 15, color = 'red'):
-        self.POSITION_OFFSET = 25
         self.game = game
         self.max_life = max_life
         self.speed = speed
         self.path = path
-        self.position = ((path[0][0] - 1) * self.game.TILES_WIDTH + self.POSITION_OFFSET, 
-                         path[0][1] * self.game.TILES_HEIGHT + self.POSITION_OFFSET)
+        self.position = ((path[0][0] - 1) * self.game.TILES_WIDTH + self.game.POSITION_OFFSET, 
+                         path[0][1] * self.game.TILES_HEIGHT + self.game.POSITION_OFFSET)
         self.path_position = 0
         self.size = size
         self.direction = (1,0)  
@@ -39,8 +38,8 @@ class Enemy:
         step = self.speed * elapsed_seconds
         #step = 20 # fix step size for debugging as delta time gets huge on debugging
 
-        next_x = (self.path[self.path_position][0] * self.game.TILES_WIDTH) + self.POSITION_OFFSET
-        next_y = (self.path[self.path_position][1] * self.game.TILES_HEIGHT) + self.POSITION_OFFSET
+        next_x = (self.path[self.path_position][0] * self.game.TILES_WIDTH) + self.game.POSITION_OFFSET
+        next_y = (self.path[self.path_position][1] * self.game.TILES_HEIGHT) + self.game.POSITION_OFFSET
 
         updated_x = self.position[0] + (step * self.direction[0])
         updated_y = self.position[1] + (step * self.direction[1])
