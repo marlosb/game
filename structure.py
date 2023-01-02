@@ -8,9 +8,10 @@ class StructureType(Enum):
     MEELE = auto()
 
 class DefensiveStructure():
-    def __init__(self, game, position: tuple[int,int] = (6, 5), type: StructureType = StructureType.RANGE , 
+    def __init__(self, game, enemies, position: tuple[int,int] = (6, 5), type: StructureType = StructureType.RANGE , 
                  rate_of_fire: int = 2, damage: int = 20, range: int = 0, color : str = 'blue'):
         self.game = game
+        self.enemies = enemies
         self.type = type
         self.seconds_between_shots = 1 / rate_of_fire 
         self.damage = damage
@@ -44,7 +45,7 @@ class DefensiveStructure():
     def get_closest_enemy(self):
         closest_enemy = False
         lowest_distance = self.range
-        for enemy in self.game.enemy_list:
+        for enemy in self.enemies.enemy_list:
             distance = sqrt((self.position[0] - enemy.position[0]) ** 2 
                             + (self.position[1] - enemy.position[1]) ** 2)
             if (distance < lowest_distance) and (distance < self.range):
