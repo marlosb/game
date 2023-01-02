@@ -12,16 +12,17 @@ class EnemyLevels(TypedDict):
 enemy_level_1: EnemyProperties = {'max_life': 80, 'speed': 100, 'size': 15, 'color': 'red'}
 enemy_level_2: EnemyProperties = {'max_life': 120, 'speed': 140, 'size': 15, 'color': 'red3'}
 enemy_level_3: EnemyProperties = {'max_life': 180, 'speed': 180, 'size': 15, 'color': 'red4'}
+enemy_level_4: EnemyProperties = {'max_life': 200, 'speed': 200, 'size': 15, 'color': 'brown4'}
 
 enemies_properties : EnemyLevels = {1: enemy_level_1,
                                     2: enemy_level_1,
                                     3: enemy_level_2,
                                     4: enemy_level_2,
-                                    5: enemy_level_2,
+                                    5: enemy_level_3,
                                     6: enemy_level_3,
-                                    7: enemy_level_3,
-                                    8: enemy_level_3,
-                                    9: enemy_level_3}
+                                    7: enemy_level_4,
+                                    8: enemy_level_4,
+                                    9: enemy_level_4}
 
 class StructureProperties(TypedDict):
     rate_of_fire : int

@@ -12,7 +12,7 @@ class Enemy:
         self.size = size
         self.direction = (1,0)  
         self.color = color
-        self.score_value = max_life + speed + size
+        self.score_value = max_life * speed
 
     def _get_direction(self, next_x, next_y):
         ''' Method to update the direction enemy is going. 

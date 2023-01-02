@@ -31,7 +31,7 @@ class Game:
         self.accumulated_seconds = 0
         self.strustures_list = []
         self.level = 1
-        self.score = 1000
+        self.score = 50000
         self.capital_life = 250
         self.set_next_level_score()
         self.set_max_structures()
@@ -80,6 +80,9 @@ class Game:
             self.strustures_list.append(DefensiveStructure(self, self.enemy_convoy, position = pos, **structure_properties[self.level]))
             print(f'Structure level is {self.level}  and arguments are {structure_properties[self.level]}')
 
+    def reset_accumulated_timer(self):
+        self.accumulated_seconds = 0
+
     def draw(self):
         self.screen.fill('black')
         self.map.draw()
@@ -126,7 +129,7 @@ class EnemyConvoy:
     def spaw_enemy(self):
         if self.enemies_in_wave and self.game.accumulated_seconds >= 1:
             self.get_enemy(self.enemies_in_wave.pop(0))
-            self.game.accumulated_seconds = 0
+            self.game.reset_accumulated_timer()
         if self.game.accumulated_seconds < 5:
             return
         self.create_convoy()
