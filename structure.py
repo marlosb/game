@@ -9,13 +9,14 @@ class StructureType(Enum):
 
 class DefensiveStructure():
     def __init__(self, game, position: tuple[int,int] = (6, 5), type: StructureType = StructureType.RANGE , 
-                 rate_of_fire: int = 2, damage: int = 20, range:int = 0):
+                 rate_of_fire: int = 2, damage: int = 20, range: int = 0, color : str = 'blue'):
         self.game = game
         self.type = type
         self.seconds_between_shots = 1 / rate_of_fire 
         self.damage = damage
         self.position = (position[0] * self.game.TILES_WIDTH + self.game.POSITION_OFFSET, 
                          position[1] * self.game.TILES_HEIGHT + self.game.POSITION_OFFSET)
+        self.color = color
         self.clock = None
         self.delta_milliseconds = 0
         self.accumulated_seconds = 0
@@ -65,6 +66,6 @@ class DefensiveStructure():
         self.shot_enemy()
     
     def draw(self):
-        pygame.draw.circle(self.game.screen, 'blue', self.position, 20)
+        pygame.draw.circle(self.game.screen, self.color, self.position, 20)
         if self.shot and (self.accumulated_seconds <= 0.15):
             pygame.draw.line(self.game.screen, 'white', self.position, self.shot.position, width=3)

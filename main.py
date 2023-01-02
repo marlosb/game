@@ -5,18 +5,13 @@ import pygame
 
 from enemies import Enemy
 import map
-from objects_levels import enemies_properties
+from objects_levels import enemies_properties, structure_properties
 from settings import screen_properties
 from structure import DefensiveStructure
 
 class GameState(Enum):
     STOPPED = auto()
     RUNNING = auto()
-
-class SpawMode(Enum):
-    ENEMY = auto()
-    STRUCTURE = auto()
-    SHOT = auto()
 
 class Game:
     def __init__(self, screen_properties: dict):
@@ -28,7 +23,6 @@ class Game:
         self.clock = pygame.time.Clock()
         self.accumulated_seconds = 0
         self.status = GameState.STOPPED
-        self.spaw_mode = SpawMode.STRUCTURE
         self.enemy_list = []
         self.strustures_list = []
         self.enemies_clock = None
@@ -67,14 +61,12 @@ class Game:
         self.level = self.level + 1
         self.next_level_score = self.next_level_score * 2
 
-    def get_enemy(self, enemy_level):
-        self.enemy_list.append(Enemy(self, self.map.path, **enemies_properties[enemy_level]))
-
     def get_structure(self):
         pos = pygame.mouse.get_pos()
         pos = (int(pos[0] / self.TILES_WIDTH), int(pos[1] / self.TILES_HEIGHT))
+        print(f'Structure level is {self.structure_level}  and arguments are {structure_properties[self.structure_level]}')
         if pos not in game.map.path:
-            self.strustures_list.append(DefensiveStructure(self, position = pos, range = 100))
+            self.strustures_list.append(DefensiveStructure(self, position = pos, **structure_properties[self.level]))
 
     def draw(self):
         self.screen.fill('black')
@@ -84,24 +76,10 @@ class Game:
         for structure in self.strustures_list:
             structure.draw()
 
-    def spaw_object(self):
-        spaw_dict = {SpawMode.ENEMY: self.get_enemy,
-                     SpawMode.STRUCTURE: self.get_structure}
-        spaw_dict[self.spaw_mode]()
-
-    def key_down(self, event):
-        if event.key == pygame.K_1:
-            self.spaw_mode = SpawMode.STRUCTURE
-        elif event.key == pygame.K_2:
-            self.spaw_mode = SpawMode.STRUCTURE
-        elif event.key == pygame.K_3:
-            self.spaw_mode = SpawMode.STRUCTURE
-
     def creat_enemy_wave(self):
         min_lengh = max(3, self.level - 3)
         max_lengh = min(self.level + 3, 10)
         wave_lenght = randint(min_lengh, max_lengh)
-        print(f'Level is {self.level} and wave lenght is {wave_lenght}')
         for i in range(0, wave_lenght):
             self.enemies_in_wave.append(randint(1, self.level))
     
@@ -113,6 +91,9 @@ class Game:
             return
         self.creat_enemy_wave()
 
+    def get_enemy(self, enemy_level):
+        self.enemy_list.append(Enemy(self, self.map.path, **enemies_properties[enemy_level]))
+
     def check_events(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -120,7 +101,15 @@ class Game:
             if event.type == pygame.KEYDOWN:
                 self.key_down(event)
             if event.type == pygame.MOUSEBUTTONDOWN:
-                self.spaw_object()
+                self.get_structure()
+
+    def key_down(self, event):
+        if event.key == pygame.K_1:
+            self.structure_level = 1
+        elif event.key == pygame.K_2:
+            self.structure_level = 2
+        elif event.key == pygame.K_3:
+            self.structure_level = 3
 
     def run(self):
         if self.status == GameState.STOPPED:
