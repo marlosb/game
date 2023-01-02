@@ -30,6 +30,7 @@ class Game:
         self.score = 1000
         self.next_level_score = 2 * self.score
         self.enemies_in_wave = []
+        self.capital_life = 250
 
     def initialize(self):
         self.status =  GameState.RUNNING
@@ -43,7 +44,7 @@ class Game:
         pygame.display.flip()
         self.delta_milliseconds = self.clock.tick(self.FPS)
         self.add_timer()
-        pygame.display.set_caption(f'Great Game Name - FPS: {self.clock.get_fps() : .1f} - Level: {self.level} - Score: {self.score}')
+        pygame.display.set_caption(f'Great Game Name - FPS: {self.clock.get_fps() : .1f} - Level: {self.level} - Score: {self.score} - Capital life: {self.capital_life}')
         self.spaw_enemy()
         for enemy in self.enemy_list:
             enemy.update()
@@ -57,6 +58,9 @@ class Game:
         if self.score >= self.next_level_score:
             self.up_level()
 
+    def get_capital_damage(self, damage):
+        self.capital_life = self.capital_life - damage
+
     def up_level(self):
         self.level = self.level + 1
         self.next_level_score = self.next_level_score * 2
@@ -64,7 +68,7 @@ class Game:
     def get_structure(self):
         pos = pygame.mouse.get_pos()
         pos = (int(pos[0] / self.TILES_WIDTH), int(pos[1] / self.TILES_HEIGHT))
-        print(f'Structure level is {self.structure_level}  and arguments are {structure_properties[self.structure_level]}')
+        print(f'Structure level is {self.level}  and arguments are {structure_properties[self.level]}')
         if pos not in game.map.path:
             self.strustures_list.append(DefensiveStructure(self, position = pos, **structure_properties[self.level]))
 

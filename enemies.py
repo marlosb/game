@@ -74,6 +74,7 @@ class Enemy:
     def check_oob(self): # check if it is out of boundaries
         max_x, max_y = pygame.display.get_window_size()
         if (self.position[0] + self.size >= max_x + self.size) or (self.position[1]  + self.size >= max_y + self.size):
+            self.game.get_capital_damage(self.max_life)
             return True
         return False
 
