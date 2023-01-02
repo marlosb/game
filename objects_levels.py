@@ -35,7 +35,7 @@ class StructureLevels(TypedDict):
 
 structure_level_1: StructureProperties = {'rate_of_fire': 2, 'damage': 20, 'range': 100, 'color': 'deepskyblue'}
 structure_level_2: StructureProperties = {'rate_of_fire': 3, 'damage': 25, 'range': 130, 'color': 'blue'}
-structure_level_3: StructureProperties = {'rate_of_fire': 4, 'damage': 25, 'range': 160, 'color': 'blue4'}
+structure_level_3: StructureProperties = {'rate_of_fire': 3, 'damage': 25, 'range': 160, 'color': 'blue4'}
 
 structure_properties : EnemyLevels = {1: structure_level_1,
                                     2: structure_level_1,

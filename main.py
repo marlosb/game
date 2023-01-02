@@ -36,7 +36,7 @@ class Game:
         self.defense = DefensiveStructuresNetwork(self, self.enemy_convoy)
     
     def set_next_level_score(self):
-        self.next_level_score = 2 * self.score
+        self.next_level_score = 1.6 * self.score
 
     def add_timer(self):
         self.accumulated_seconds = self.accumulated_seconds + (self.delta_milliseconds / 1000)
@@ -57,10 +57,14 @@ class Game:
     def get_capital_damage(self, damage: int):
         self.capital_life = self.capital_life - damage
 
+    def recovery_capital(self, recovery_fraction: float):
+        self.capital_life = int(self.capital_life * (1 + recovery_fraction))
+
     def up_level(self):
         self.level = self.level + 1
         self.set_next_level_score()
         self.defense.set_max_structures()
+        self.recovery_capital(0.05) # recovers 5% of capital live each level up
 
     def get_mouse_tile(self):
         pos = pygame.mouse.get_pos()
