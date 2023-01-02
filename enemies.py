@@ -1,4 +1,44 @@
+from random import randint
+
 import pygame
+
+from objects_levels import enemies_properties
+
+class EnemyConvoy:
+    def __init__(self, game, map):
+        self.game = game
+        self.map = map
+        self.enemy_list = []
+        self.enemies_in_wave = []
+
+    def create_convoy(self):
+        min_lengh = max(3, self.game.level - 3)
+        max_lengh = min(self.game.level + 3, 10)
+        wave_lenght = randint(min_lengh, max_lengh)
+        for i in range(0, wave_lenght):
+            self.enemies_in_wave.append(randint(1, self.game.level))
+    
+    def spaw_enemy(self):
+        if self.enemies_in_wave and self.game.accumulated_seconds >= 1:
+            self.get_enemy(self.enemies_in_wave.pop(0))
+            self.game.reset_accumulated_timer()
+        if self.game.accumulated_seconds < 5:
+            return
+        self.create_convoy()
+
+    def get_enemy(self, enemy_level: int):
+        self.enemy_list.append(Enemy(self.game, self.map.path, **enemies_properties[enemy_level]))
+
+    def update(self):
+        self.spaw_enemy()
+        for enemy in self.enemy_list:
+            enemy.update()
+            if enemy.check_oob() or enemy.check_death():
+                self.enemy_list.remove(enemy) 
+
+    def draw(self):
+        for enemy in self.enemy_list:
+            enemy.draw()
 
 class Enemy:
     def __init__(self, game, path, max_life: int = 80, speed: int = 25, size: int = 15, color = 'red'):

@@ -1,11 +1,38 @@
 from enum import Enum, auto
-from math import acos, cos, sin, sqrt
+from math import sqrt
+
+from objects_levels import structure_properties
 
 import pygame
 
 class StructureType(Enum):
     RANGE = auto()
     MEELE = auto()
+
+class DefensiveStructuresNetwork:
+    def __init__(self, game, map, enemy_convoy):
+        self.strustures_list = []
+        self.game = game
+        self.map = map
+        self.enemy_convoy = enemy_convoy
+        self.set_max_structures()
+
+    def set_max_structures(self):
+        self.max_structures = 1 + int(self.game.level / 2)
+
+    def get_structure(self):
+        pos = self.game.get_mouse_tile()
+        if pos not in self.map.path and len(self.strustures_list) < self.max_structures:
+            self.strustures_list.append(DefensiveStructure(self.game, self.enemy_convoy, position = pos, **structure_properties[self.game.level]))
+            print(f'Structure level is {self.game.level}  and arguments are {structure_properties[self.game.level]}')
+
+    def update(self):
+        for structure in self.strustures_list:
+            structure.run()
+   
+    def draw(self):
+        for structure in self.strustures_list:
+            structure.draw()
 
 class DefensiveStructure():
     def __init__(self, game, enemies, position: tuple[int,int] = (6, 5), type: StructureType = StructureType.RANGE , 

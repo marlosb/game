@@ -39,7 +39,7 @@ structure_level_3: StructureProperties = {'rate_of_fire': 3, 'damage': 25, 'rang
 
 structure_properties : EnemyLevels = {1: structure_level_1,
                                     2: structure_level_1,
-                                    3: structure_level_2,
+                                    3: structure_level_1,
                                     4: structure_level_2,
                                     5: structure_level_2,
                                     6: structure_level_2,

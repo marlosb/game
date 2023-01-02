@@ -3,11 +3,11 @@ from random import randint
 
 import pygame
 
-from enemies import Enemy
+from enemies import EnemyConvoy
 from map import Map, init_map
 from objects_levels import enemies_properties, structure_properties
 from settings import screen_properties
-from structure import DefensiveStructure
+from structure import DefensiveStructuresNetwork
 
 class GameState(Enum):
     STOPPED = auto()
@@ -33,7 +33,7 @@ class Game:
         self.capital_life = 250
         self.set_next_level_score()
         self.enemy_convoy = EnemyConvoy(self, self.map)
-        self.defense = DefensiveStructuresNetwork(self, self.enemy_convoy)
+        self.defense = DefensiveStructuresNetwork(self, self.map, self.enemy_convoy)
     
     def set_next_level_score(self):
         self.next_level_score = 1.6 * self.score
@@ -89,75 +89,15 @@ class Game:
     def run(self):
         if self.status == GameState.STOPPED:
             self.initialize()
-        while True:
-            self.check_events()
-            self.update()
-            self.draw()            
+        self.check_events()
+        self.update()
+        self.draw()            
 
     def exit(self):
         self.status == GameState.STOPPED
         pygame.quit()
 
-class EnemyConvoy:
-    def __init__(self, game: Game, map: Map):
-        self.game = game
-        self.map = map
-        self.enemy_list = []
-        self.enemies_in_wave = []
-
-    def create_convoy(self):
-        min_lengh = max(3, self.game.level - 3)
-        max_lengh = min(self.game.level + 3, 10)
-        wave_lenght = randint(min_lengh, max_lengh)
-        for i in range(0, wave_lenght):
-            self.enemies_in_wave.append(randint(1, self.game.level))
-    
-    def spaw_enemy(self):
-        if self.enemies_in_wave and self.game.accumulated_seconds >= 1:
-            self.get_enemy(self.enemies_in_wave.pop(0))
-            self.game.reset_accumulated_timer()
-        if self.game.accumulated_seconds < 5:
-            return
-        self.create_convoy()
-
-    def get_enemy(self, enemy_level: int):
-        self.enemy_list.append(Enemy(self.game, self.map.path, **enemies_properties[enemy_level]))
-
-    def update(self):
-        self.spaw_enemy()
-        for enemy in self.enemy_list:
-            enemy.update()
-            if enemy.check_oob() or enemy.check_death():
-                self.enemy_list.remove(enemy) 
-
-    def draw(self):
-        for enemy in self.enemy_list:
-            enemy.draw()
-
-class DefensiveStructuresNetwork:
-    def __init__(self, game: Game, enemy_convoy: EnemyConvoy):
-        self.strustures_list = []
-        self.game = game
-        self.enemy_convoy = enemy_convoy
-        self.set_max_structures()
-
-    def set_max_structures(self):
-        self.max_structures = 1 + int(self.game.level / 2)
-
-    def get_structure(self):
-        pos = self.game.get_mouse_tile()
-        if pos not in game.map.path and len(self.strustures_list) < self.max_structures:
-            self.strustures_list.append(DefensiveStructure(self.game, self.enemy_convoy, position = pos, **structure_properties[self.game.level]))
-            print(f'Structure level is {self.game.level}  and arguments are {structure_properties[self.game.level]}')
-
-    def update(self):
-        for structure in self.strustures_list:
-            structure.run()
-   
-    def draw(self):
-        for structure in self.strustures_list:
-            structure.draw()
-
 if __name__ == '__main__':
     game = Game(screen_properties)
-    game.run()
+    while True:
+        game.run()
