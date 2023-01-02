@@ -27,20 +27,16 @@ class Game:
         pygame.init()
         self.map = Map(self, init_map, self.TILES_HEIGHT, self.TILES_HEIGHT)
         self.clock = pygame.time.Clock()
-        self.enemy_convoy = EnemyConvoy(self, self.map)
         self.accumulated_seconds = 0
-        self.strustures_list = []
         self.level = 1
         self.score = 50000
         self.capital_life = 250
         self.set_next_level_score()
-        self.set_max_structures()
+        self.enemy_convoy = EnemyConvoy(self, self.map)
+        self.defense = DefensiveStructuresNetwork(self, self.enemy_convoy)
     
     def set_next_level_score(self):
         self.next_level_score = 2 * self.score
-
-    def set_max_structures(self):
-        self.max_structures = 1 + int(self.level / 2)
 
     def add_timer(self):
         self.accumulated_seconds = self.accumulated_seconds + (self.delta_milliseconds / 1000)
@@ -51,11 +47,7 @@ class Game:
         self.add_timer()
         pygame.display.set_caption(f'Great Game Name - FPS: {self.clock.get_fps() : .1f} - Level: {self.level} - Score: {self.score} - Capital life: {self.capital_life}')
         self.enemy_convoy.update()
-        self.update_structure()
-
-    def update_structure(self):
-        for structure in self.strustures_list:
-            structure.run()
+        self.defense.update()
 
     def add_score(self, score: int):
         self.score = self.score + score
@@ -68,17 +60,11 @@ class Game:
     def up_level(self):
         self.level = self.level + 1
         self.set_next_level_score()
-        self.set_max_structures()
+        self.defense.set_max_structures()
 
     def get_mouse_tile(self):
         pos = pygame.mouse.get_pos()
         return (int(pos[0] / self.TILES_WIDTH), int(pos[1] / self.TILES_HEIGHT))
-    
-    def get_structure(self):
-        pos = self.get_mouse_tile()
-        if pos not in game.map.path and len(self.strustures_list) < self.max_structures:
-            self.strustures_list.append(DefensiveStructure(self, self.enemy_convoy, position = pos, **structure_properties[self.level]))
-            print(f'Structure level is {self.level}  and arguments are {structure_properties[self.level]}')
 
     def reset_accumulated_timer(self):
         self.accumulated_seconds = 0
@@ -87,18 +73,14 @@ class Game:
         self.screen.fill('black')
         self.map.draw()
         self.enemy_convoy.draw()
-        self.draw_structures()
-
-    def draw_structures(self):
-        for structure in self.strustures_list:
-            structure.draw()
+        self.defense.draw()
 
     def check_events(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.exit()
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                self.get_structure()
+                self.defense.get_structure()
 
     def run(self):
         if self.status == GameState.STOPPED:
@@ -147,6 +129,30 @@ class EnemyConvoy:
     def draw(self):
         for enemy in self.enemy_list:
             enemy.draw()
+
+class DefensiveStructuresNetwork:
+    def __init__(self, game: Game, enemy_convoy: EnemyConvoy):
+        self.strustures_list = []
+        self.game = game
+        self.enemy_convoy = enemy_convoy
+        self.set_max_structures()
+
+    def set_max_structures(self):
+        self.max_structures = 1 + int(self.game.level / 2)
+
+    def get_structure(self):
+        pos = self.game.get_mouse_tile()
+        if pos not in game.map.path and len(self.strustures_list) < self.max_structures:
+            self.strustures_list.append(DefensiveStructure(self.game, self.enemy_convoy, position = pos, **structure_properties[self.game.level]))
+            print(f'Structure level is {self.game.level}  and arguments are {structure_properties[self.game.level]}')
+
+    def update(self):
+        for structure in self.strustures_list:
+            structure.run()
+   
+    def draw(self):
+        for structure in self.strustures_list:
+            structure.draw()
 
 if __name__ == '__main__':
     game = Game(screen_properties)
