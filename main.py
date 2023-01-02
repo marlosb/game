@@ -1,9 +1,11 @@
 from enum import Enum, auto
+from random import randint
 
 import pygame
 
 from enemies import Enemy
 import map
+from objects_levels import enemies_properties
 from settings import screen_properties
 from structure import DefensiveStructure
 
@@ -32,7 +34,8 @@ class Game:
         self.enemies_clock = None
         self.level = 1
         self.score = 1000
-        self.next_level_score = 5 * self.score
+        self.next_level_score = 2 * self.score
+        self.enemies_in_wave = []
 
     def initialize(self):
         self.status =  GameState.RUNNING
@@ -47,9 +50,7 @@ class Game:
         self.delta_milliseconds = self.clock.tick(self.FPS)
         self.add_timer()
         pygame.display.set_caption(f'Great Game Name - FPS: {self.clock.get_fps() : .1f} - Level: {self.level} - Score: {self.score}')
-        if self.accumulated_seconds >= 1 and (len(self.enemy_list) < 5):
-            self.get_enemy()
-            self.accumulated_seconds = 0
+        self.spaw_enemy()
         for enemy in self.enemy_list:
             enemy.update()
             if enemy.check_oob() or enemy.check_death():
@@ -64,10 +65,10 @@ class Game:
 
     def up_level(self):
         self.level = self.level + 1
-        self.next_level_score = self.next_level_score * 5
+        self.next_level_score = self.next_level_score * 2
 
-    def get_enemy(self):
-        self.enemy_list.append(Enemy(self, self.map.path, 80, 100, 15))
+    def get_enemy(self, enemy_level):
+        self.enemy_list.append(Enemy(self, self.map.path, **enemies_properties[enemy_level]))
 
     def get_structure(self):
         pos = pygame.mouse.get_pos()
@@ -95,6 +96,22 @@ class Game:
             self.spaw_mode = SpawMode.STRUCTURE
         elif event.key == pygame.K_3:
             self.spaw_mode = SpawMode.STRUCTURE
+
+    def creat_enemy_wave(self):
+        min_lengh = max(3, self.level - 3)
+        max_lengh = min(self.level + 3, 10)
+        wave_lenght = randint(min_lengh, max_lengh)
+        print(f'Level is {self.level} and wave lenght is {wave_lenght}')
+        for i in range(0, wave_lenght):
+            self.enemies_in_wave.append(randint(1, self.level))
+    
+    def spaw_enemy(self):
+        if self.enemies_in_wave and self.accumulated_seconds >= 1:
+            self.get_enemy(self.enemies_in_wave.pop(0))
+            self.accumulated_seconds = 0
+        if self.accumulated_seconds < 5:
+            return
+        self.creat_enemy_wave()
 
     def check_events(self):
         for event in pygame.event.get():
