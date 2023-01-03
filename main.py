@@ -63,8 +63,8 @@ class Game:
         if self.capital_life <= 0:
             self.game_over()
 
-    def recovery_capital(self, recovery_fraction: float):
-        self.capital_life = int(self.capital_life * (1 + recovery_fraction))
+    def recovery_capital(self, recovery_amount: float):
+        self.capital_life = self.capital_life + recovery_amount
         if self.capital_life > self.capital_initial_life:
             self.capital_life = self.capital_initial_life
 
@@ -75,10 +75,10 @@ class Game:
         self.level = self.level + 1
         if self.level == 10:
             self.status = GameState.PAUSED
+        elif self.level == 5:
+            self.recovery_capital(50)
         self.set_next_level_score()
         self.defense.set_max_structures()
-        if self.level == 5:
-            self.recovery_capital(0.1) # recovers 10% of capital live each level up
         self.status = GameState.PAUSED
     
     def get_mouse_tile(self):
@@ -113,7 +113,7 @@ class Game:
 
     def display_message(self):
         image = pygame.image.load(f'images/image{self.level}.png')
-        self.screen.blit(image, (168, 65))
+        self.screen.blit(image, (100, 100))
         pygame.display.flip()
         self.check_events()
 
