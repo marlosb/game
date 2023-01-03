@@ -12,7 +12,7 @@ No graphcis, blue and red circles and allies and enemies. Gray squares are map t
 In case any designer wants to partner to improve it, reach me out and I'll be glad to accept it.
 
 ### How to play
-'''bash
+'''
 python main.py 
 '''
 
