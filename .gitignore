@@ -4,3 +4,7 @@
 __pycache__/
 images_source/
 build/
+dist/
+
+# project files
+main.spec
