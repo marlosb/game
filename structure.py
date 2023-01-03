@@ -24,7 +24,6 @@ class DefensiveStructuresNetwork:
         pos = self.game.get_mouse_tile()
         if pos not in self.map.path and len(self.strustures_list) < self.max_structures:
             self.strustures_list.append(DefensiveStructure(self.game, self.enemy_convoy, position = pos, **structure_properties[self.game.level]))
-            print(f'Structure level is {self.game.level}  and arguments are {structure_properties[self.game.level]}')
 
     def update(self):
         for structure in self.strustures_list:
