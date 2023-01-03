@@ -9,3 +9,4 @@ dist/
 # project files
 main.spec
 pyinstaller_command_line.txt
+icon.ico
