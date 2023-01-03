@@ -54,10 +54,14 @@ class Game:
         if self.score >= self.next_level_score:
             self.up_level()
 
+    def game_over(self):
+        self.status = GameState.PAUSED
+        self.level = 0
+    
     def get_capital_damage(self, damage: int):
         self.capital_life = self.capital_life - damage
         if self.capital_life <= 0:
-            self.status = GameState.GAME_OVER
+            self.game_over()
 
     def recovery_capital(self, recovery_fraction: float):
         self.capital_life = int(self.capital_life * (1 + recovery_fraction))
@@ -70,10 +74,6 @@ class Game:
         self.defense.set_max_structures()
         self.recovery_capital(0.05) # recovers 5% of capital live each level up
         self.status = GameState.PAUSED
-
-    def end_game(self):
-        self.display_message()
-        self.exit()
     
     def get_mouse_tile(self):
         pos = pygame.mouse.get_pos()
@@ -91,10 +91,12 @@ class Game:
     def mouse_clicked(self):
         if self.status == GameState.RUNNING:
             self.defense.get_structure()
-        else:
+        elif 0 < self.level < 10:
             self.status = GameState.RUNNING
             self.reset_accumulated_timer()
             self.clock.tick(self.FPS)
+        else:
+            self.exit()
     
     def check_events(self):
         for event in pygame.event.get():
@@ -104,7 +106,7 @@ class Game:
                 self.mouse_clicked()
 
     def display_message(self):
-        image = pygame.image.load('images/test1.png')
+        image = pygame.image.load(f'images/image{self.level}.png')
         self.screen.blit(image, (168, 65))
         pygame.display.flip()
         self.check_events()
@@ -117,8 +119,7 @@ class Game:
     def run(self):
         run_modes_dict = {GameState.STOPPED: self.initialize,
                           GameState.PAUSED: self.display_message,
-                          GameState.RUNNING: self._run,
-                          GameState.GAME_OVER: self.exit}
+                          GameState.RUNNING: self._run}
         run_modes_dict[self.status]()
 
     def exit(self):
