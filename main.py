@@ -117,10 +117,10 @@ class Game:
     def resource_path(relactive_path):
         if hasattr(sys, '_MEIPASS'):
             return path.join(sys._MEIPASS, relactive_path)
-        return path.join(path.abspath('.'), relactive_path)
+        return path.join(path.abspath('images\\'), relactive_path)
     
     def display_message(self):
-        image_path = self.resource_path(f'images/image{self.level}.png')
+        image_path = self.resource_path(f'image{self.level}.png')
         image = pygame.image.load(image_path)
         self.screen.blit(image, (100, 100))
         pygame.display.flip()
