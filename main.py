@@ -140,7 +140,7 @@ class Game:
     def exit(self):
         self.status == GameState.GAME_OVER
         pygame.quit()
-        exit()
+        sys.exit(0)
 
 if __name__ == '__main__':
     game = Game(screen_properties)
