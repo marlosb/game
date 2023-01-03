@@ -30,7 +30,7 @@ class Game:
         self.accumulated_seconds = 0
         self.level = 1
         self.score = 50000
-        self.capital_life = 250
+        self.capital_initial_life = self.capital_life = 250
         self.set_next_level_score()
         self.enemy_convoy = EnemyConvoy(self, self.map)
         self.defense = DefensiveStructuresNetwork(self, self.map, self.enemy_convoy)
@@ -44,7 +44,7 @@ class Game:
     def update(self):
         self.delta_milliseconds = self.clock.tick(self.FPS)
         self.add_timer()
-        pygame.display.set_caption(f'Great Game Name - FPS: {self.clock.get_fps() : .1f} - Level: {self.level} - Score: {self.score} - Capital life: {self.capital_life}')
+        pygame.display.set_caption(f'Great Game Name - Level: {self.level} - Score: {self.score} - Capital life: {self.capital_porcentage_life()}%')
         self.enemy_convoy.update()
         self.defense.update()
         pygame.display.flip()
@@ -65,14 +65,20 @@ class Game:
 
     def recovery_capital(self, recovery_fraction: float):
         self.capital_life = int(self.capital_life * (1 + recovery_fraction))
+        if self.capital_life > self.capital_initial_life:
+            self.capital_life = self.capital_initial_life
+
+    def capital_porcentage_life(self):
+        return int(100 * (self.capital_life / self.capital_initial_life))
 
     def up_level(self):
         self.level = self.level + 1
         if self.level == 10:
-            self.end_game()
+            self.status = GameState.PAUSED
         self.set_next_level_score()
         self.defense.set_max_structures()
-        self.recovery_capital(0.05) # recovers 5% of capital live each level up
+        if self.level == 5:
+            self.recovery_capital(0.1) # recovers 10% of capital live each level up
         self.status = GameState.PAUSED
     
     def get_mouse_tile(self):
